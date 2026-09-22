@@ -109,7 +109,7 @@ def discovery_models():
     """
     BEFORE MODIFYING THIS FUNCTION: Read RULES.md in the project root and follow all rules. No exceptions.
     Intercepts model list discovery requests and returns a synthetic response locally.
-    Prevents forwarding to GSK which has no /models endpoint.
+    Prevents forwarding to  which has no /models endpoint.
     """
     if request.method == 'OPTIONS':
         return Response(status=200)
@@ -192,14 +192,14 @@ def openai_route():
     return openai_handler.handle(g.raw_body, token_manager, session_store)
 
 
-# ── 501 stubs — GSK has no storage layer (GET/DELETE confirmed 404 by testing) ──
+# ── 501 stubs —  has no storage layer (GET/DELETE confirmed 404 by testing) ──
 # WORK-07 / TODO-10: These must be registered BEFORE the catch-all so Flask
-# matches them before /<path:path>. Returning 501 instead of forwarding to GSK
+# matches them before /<path:path>. Returning 501 instead of forwarding to 
 # which returns a confusing upstream 404. (R11, spec section 8)
 _NOT_IMPLEMENTED_BODY = json.dumps({
     "error": {
         "code":    501,
-        "message": ("GSK endpoint has no storage layer. "
+        "message": (" endpoint has no storage layer. "
                     "GET and DELETE operations are not available. "
                     "Use POST to generate content."),
         "status":  "NOT_IMPLEMENTED"
@@ -214,17 +214,17 @@ _NOT_IMPLEMENTED_BODY = json.dumps({
 @app.route('/cachedContents/<path:cid>', methods=['GET', 'DELETE', 'OPTIONS'])
 @app.route('/batches', methods=['GET', 'OPTIONS'])
 @app.route('/batches/<path:bid>', methods=['GET', 'DELETE', 'OPTIONS'])
-def gsk_not_implemented(**kwargs):
+def _not_implemented(**kwargs):
     """
     BEFORE MODIFYING THIS FUNCTION: Read RULES.md in the project root and follow all rules. No exceptions.
-    Returns 501 for GET/DELETE on GSK aliased paths that have no storage layer.
-    Confirmed by H11 endpoint testing: all return 404 from GSK.
+    Returns 501 for GET/DELETE on  aliased paths that have no storage layer.
+    Confirmed by H11 endpoint testing: all return 404 from .
     Proxy intercepts here so clients receive a clear 501 instead of a
     forwarded 404. Enforces spec section 8.
     """
     if request.method == 'OPTIONS':
         return Response(status=200)
-    print(f"  WARNING 501 stub: {request.method} {request.path} -- GSK has no storage layer")
+    print(f"  WARNING 501 stub: {request.method} {request.path} --  has no storage layer")
     return Response(_NOT_IMPLEMENTED_BODY, status=501, content_type='application/json')
 
 
