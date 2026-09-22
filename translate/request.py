@@ -6,12 +6,12 @@ Layer Architecture: Layer 4 (Translation - Request).
 Contracts Served: Contract 1 (OpenAI Chat Completions).
 Dependencies: json, session.SessionStore.
 
-GSK GATEWAY NOTE: The GSK Kong gateway runs a pre-Gemini-3 schema that does
+ GATEWAY NOTE: The Kong gateway runs a pre-Gemini-3 schema that does
 not recognise the 'id' field on functionCall or functionResponse objects.
 The 'id' is stripped before forwarding but preserved in SessionStore so the
 proxy can maintain tool_call_id <-> name <-> thoughtSignature mapping internally.
 
-GSK VPCSC NOTE: The GSK Kong gateway blocks all fileData with http:// or
+ VPCSC NOTE: The  Kong gateway blocks all fileData with http:// or
 https:// URIs via VPC Service Controls. Such URIs must be rejected at the
 proxy with HTTP 400. data: URIs must be converted to inlineData. gs:// URIs
 are routable and forwarded as fileData. (R18)
@@ -26,7 +26,7 @@ class TranslationError(Exception):
     """
     BEFORE MODIFYING THIS CLASS: Read RULES.md in the project root and follow all rules. No exceptions.
     Raised by openai_to_gemini() when a request cannot be translated due to
-    a GSK constraint or unsupported feature. The message is returned as a
+    a  constraint or unsupported feature. The message is returned as a
     400 response body to the client by openai_handler.handle().
 
     Attributes:
@@ -67,14 +67,14 @@ def _translate_image_url_item(item: dict) -> dict:
         return {"inlineData": {"mimeType": mime, "data": b64data}}
 
     elif url.startswith('gs://'):
-        # R18: gs:// URIs forwarded as fileData — GSK routes GCS (confirmed M14)
+        # R18: gs:// URIs forwarded as fileData —  routes GCS (confirmed M14)
         mime = item.get('image_url', {}).get('mime_type', 'image/jpeg')
         return {"fileData": {"fileUri": url, "mimeType": mime}}
 
     elif url.startswith('http://') or url.startswith('https://'):
         # R18: VPCSC permanent block — confirmed M14 test
         raise TranslationError(
-            "fileData HTTP/HTTPS URIs are blocked by GSK VPC Service Controls. "
+            "fileData HTTP/HTTPS URIs are blocked by  VPC Service Controls. "
             "Use base64 inlineData (data: URI) or a GCS gs:// URI instead.",
             "INVALID_ARGUMENT"
         )
@@ -88,7 +88,7 @@ def _translate_image_url_item(item: dict) -> dict:
 
 
 # Keys that are valid JSON Schema but are not recognised by Gemini's
-# OpenAPI-3.0-subset function-parameter parser. GSK returns a 400
+# OpenAPI-3.0-subset function-parameter parser.  returns a 400
 # ("Unknown name ... Cannot find field") if these are present anywhere
 # in the schema tree, including nested under properties/items.
 _UNSUPPORTED_SCHEMA_KEYS = frozenset({
@@ -118,7 +118,7 @@ def _sanitize_json_schema(schema):
         keywords (anyOf/oneOf/allOf) so nested tool schemas are cleaned too.
 
     Parameters: schema (dict | list | Any): A JSON Schema fragment.
-    Returns: The sanitized schema, same shape, safe for GSK forwarding.
+    Returns: The sanitized schema, same shape, safe for  forwarding.
     Raises: None.
     Side effects: None — returns a new structure, does not mutate input.
     """
@@ -174,15 +174,15 @@ def openai_to_gemini(
     Enforces R3, R4, R5, R9, R13, R18.
     Side effects: Reads from SessionStore, potentially clears turn state.
 
-    GSK gateway constraint: 'id' field is stripped from functionCall and
+     gateway constraint: 'id' field is stripped from functionCall and
     functionResponse before forwarding. call_id is stored in session only.
 
-    GSK VPCSC constraint: image_url with http/https raises TranslationError (R18).
+     VPCSC constraint: image_url with http/https raises TranslationError (R18).
     data: URIs converted to inlineData. gs:// URIs forwarded as fileData.
     """
-    # ── WORK-03: Strip Responses API fields — GSK rejects these with 400 ────
+    # ── WORK-03: Strip Responses API fields —  rejects these with 400 ────
     # store, previous_response_id, background, input are Interactions/Responses
-    # API fields not supported by the GSK generateContent backend.
+    # API fields not supported by the  generateContent backend.
     for _field in ('store', 'previous_response_id', 'background', 'metadata',
                    'include', 'truncation', 'reasoning', 'input'):
         openai_payload.pop(_field, None)
@@ -444,7 +444,7 @@ def openai_to_gemini(
                                 }})
                             elif url.startswith('http://') or url.startswith('https://'):
                                 raise TranslationError(
-                                    "fileData HTTP/HTTPS URIs are blocked by GSK VPC Service Controls. "
+                                    "fileData HTTP/HTTPS URIs are blocked by  VPC Service Controls. "
                                     "Use base64 inlineData or a GCS gs:// URI instead.",
                                     "INVALID_ARGUMENT"
                                 )
@@ -483,13 +483,13 @@ def openai_to_gemini(
                     elif not isinstance(args_val, dict):
                         args_val = {"value": args_val}
 
-                    # GSK gateway constraint: 'id' stripped from functionCall before forwarding.
+                    #  gateway constraint: 'id' stripped from functionCall before forwarding.
                     # call_id preserved in session for name/thoughtSignature reconstruction.
                     part = {
                         "functionCall": {
                             "name": meta.name if meta else tc['function']['name'],
                             "args": args_val
-                            # NOTE: 'id' intentionally omitted — GSK gateway rejects it
+                            # NOTE: 'id' intentionally omitted —  gateway rejects it
                         }
                     }
 
@@ -527,7 +527,7 @@ def openai_to_gemini(
     # consumes the entire token budget on internal reasoning and produces
     # zero visible output. LOW minimises reasoning tokens while keeping
     # the model functional. Client-supplied thinkingConfig is preserved.
-    # Constraint: thinkingLevel and thinkingBudget cannot coexist (400 from GSK).
+    # Constraint: thinkingLevel and thinkingBudget cannot coexist (400 from ).
     _existing_tc = gemini_body.get('generationConfig', {}).get('thinkingConfig', {})
     if not _existing_tc.get('thinkingLevel') and not _existing_tc.get('thinkingBudget'):
         gemini_body.setdefault('generationConfig', {})['thinkingConfig'] = {
@@ -558,7 +558,7 @@ def _flush_tool_messages(messages: list, session_id: str,
     Returns: None
     Enforces R9, R17.
 
-    GSK gateway constraint: 'id' stripped from functionResponse before forwarding.
+     gateway constraint: 'id' stripped from functionResponse before forwarding.
     The name is looked up from session using tool_call_id as key.
     """
     parts = []
@@ -582,7 +582,7 @@ def _flush_tool_messages(messages: list, session_id: str,
             # be a JSON object. json.loads() succeeds without raising on a bare
             # scalar (e.g. the string "21.61018278497431" parses cleanly to a
             # float), so checking only for JSONDecodeError let scalars through
-            # unwrapped, producing a 400 from GSK ("Invalid value ... Struct").
+            # unwrapped, producing a 400 from  ("Invalid value ... Struct").
             # Any non-dict parse result — number, bool, string, list — must be
             # wrapped the same way a decode failure already is.
             try:
@@ -597,7 +597,7 @@ def _flush_tool_messages(messages: list, session_id: str,
 
         parts.append({
             "functionResponse": {
-                # NOTE: 'id' intentionally omitted — GSK gateway rejects it
+                # NOTE: 'id' intentionally omitted —  gateway rejects it
                 "name":     name,
                 "response": content
             }
