@@ -3,19 +3,19 @@
 Module: handlers.responses_handler
 Purpose: Handles the OpenAI Responses API surface (POST /v1/responses and
          supporting CRUD/compaction endpoints), translating to/from the
-         Gemini generateContent schema via the GSK gateway.
+         Gemini generateContent schema via the  gateway.
 Layer Architecture: Layers 2, 3, 4, 5, 6, 7 (same as openai_handler, plus
                      a synthetic response-store layer for GET/DELETE).
 Contracts Served: Contract 1 (OpenAI), Responses API surface specifically.
 Dependencies: json, time, uuid, requests, config, transforms.path,
               translate.request, translate.response, session.
 
-GSK GATEWAY NOTE: The Responses API fields store, previous_response_id,
+ GATEWAY NOTE: The Responses API fields store, previous_response_id,
 background, input are stripped by translate.request.openai_to_gemini()
-before forwarding — GSK does not support them (confirmed by testing:
+before forwarding —  does not support them (confirmed by testing:
 "Unknown name 'store'", "Unknown name 'input'"). This handler synthesises
 the storage and ID-chaining behaviour the client expects, entirely
-proxy-side, since GSK has no native Responses API or Interactions API
+proxy-side, since  has no native Responses API or Interactions API
 storage layer (confirmed: GET/DELETE on /interactions/{id} return 404).
 
 STORAGE STRATEGY (spec section 4.10, Option A): completed responses are
@@ -82,7 +82,7 @@ def _gemini_response_to_responses_api(
     Output item union type per spec section 3.4.7: only 'message' and
     'function_call' item types are populated here; other types
     (reasoning, mcp_call, image_generation_call, etc.) are not produced
-    by the GSK gateway and are out of scope for this translation.
+    by the  gateway and are out of scope for this translation.
     """
     candidates = gemini_json.get('candidates', [])
     output = []
@@ -161,7 +161,7 @@ def handle(raw_body: bytes, token_manager, session_store: SessionStore) -> Respo
       instructions       -> systemInstruction
       text.format         -> generationConfig.responseMimeType + responseSchema
       max_output_tokens   -> generationConfig.maxOutputTokens
-      store, background, metadata -> stripped (GSK rejects)
+      store, background, metadata -> stripped ( rejects)
 
     previous_response_id chaining (fix, was previously a no-op): the prior
     turn's messages are retrieved from SessionStore.get_response_messages()
@@ -284,7 +284,7 @@ def _send(gemini_body: dict, target_url: str, headers: dict,
           session_store: SessionStore, chain_messages: list) -> Response:
     """
     BEFORE MODIFYING THIS FUNCTION: Read RULES.md in the project root and follow all rules. No exceptions.
-    Non-streaming dispatch for the Responses API. Forwards to GSK,
+    Non-streaming dispatch for the Responses API. Forwards to ,
     translates the response, stores it in the response cache (spec section 4.10
     Option A), and returns it to the client.
 
@@ -501,7 +501,7 @@ def handle_get(response_id: str, session_store: SessionStore) -> Response:
                 session_store (SessionStore): Shared session store.
     Returns: Response — JSON response object, or 404 if not found.
 
-    GSK does not expose this natively (confirmed: GET /interactions/{id}
+     does not expose this natively (confirmed: GET /interactions/{id}
     returns 404). This implements spec section 4.10 Option A: in-memory cache,
     populated by _send()/_stream() on every successful completion. Lost on
     proxy restart -- documented limitation.
