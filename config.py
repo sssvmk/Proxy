@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 # Enforces R15: No module reads os.environ directly — all config via config.py
 load_dotenv()  # loads .env into os.environ — called once here only
 
-_required = ["GSK_OAUTH_URL", "GSK_CLIENT_ID", "GSK_CLIENT_SECRET", "GSK_GEMINI_BASE_URL"]
+_required = ["_OAUTH_URL", "_CLIENT_ID", "_CLIENT_SECRET", "_GEMINI_BASE_URL"]
 for _var in _required:
     if not os.environ.get(_var):
         # Enforces R16: config.py raises EnvironmentError on missing required secrets at import
@@ -20,13 +20,13 @@ for _var in _required:
                                f"Check your .env file.")
 
 # ── Secrets (from .env) ──────────────────────────────────────────────────────
-OAUTH_URL     = os.environ["GSK_OAUTH_URL"]
-CLIENT_ID     = os.environ["GSK_CLIENT_ID"]
-CLIENT_SECRET = os.environ["GSK_CLIENT_SECRET"]
-GSK_BASE_URL  = os.environ["GSK_GEMINI_BASE_URL"].rstrip("/")
+OAUTH_URL     = os.environ["_OAUTH_URL"]
+CLIENT_ID     = os.environ["_CLIENT_ID"]
+CLIENT_SECRET = os.environ["_CLIENT_SECRET"]
+_BASE_URL  = os.environ["_GEMINI_BASE_URL"].rstrip("/")
 
 # ── Tunables (version-controlled constants — change here, not in .env) ───────
-ALLOWED_MODEL            = "gemini-3.1-pro-preview"  # GSK gateway allowed model
+ALLOWED_MODEL            = "gemini-3.1-pro-preview"  #  gateway allowed model
 PROXY_PORT               = 5000                       # Flask listen port
 TOKEN_EXPIRY_BUFFER_SECS = 60      # Refresh token this many seconds before expiry
 SESSION_TTL_SECS         = 1800    # Evict session after 30 min inactivity
