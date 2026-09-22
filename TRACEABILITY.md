@@ -21,7 +21,7 @@ This table maps the critical rules defined in §13 of the `proxy_v2` specificati
 | **R15** | No module reads `os.environ` directly except config | `config.py` (global scope), all other modules import `config` |
 | **R16** | Raises `EnvironmentError` on missing secrets | `config.py` (startup validation loop) |
 | **R17** | Parallel `functionResponse` sent in single user turn | `translate/request.py` (`openai_to_gemini` -> `_flush_tool_messages`) |
-| **R18** | `fileData` http/https URIs rejected before forwarding to GSK (VPCSC) | `handlers/gemini_handler.py` (`_scan_filedata_uris`, `handle`), `translate/request.py` (`_translate_image_url_item`, `openai_to_gemini`) |
+| **R18** | `fileData` http/https URIs rejected before forwarding to  (VPCSC) | `handlers/gemini_handler.py` (`_scan_filedata_uris`, `handle`), `translate/request.py` (`_translate_image_url_item`, `openai_to_gemini`) |
 
 *Last verified during Issue 1–6 + New A/B/C fixes — 2026-06-18.*
 
@@ -37,7 +37,7 @@ This table maps the critical rules defined in §13 of the `proxy_v2` specificati
 | WORK-04 | `translate/request.py` (`openai_to_gemini` system/developer role) | (gap fix) |
 | WORK-05 | `translate/response.py` (`gemini_to_openai`, `translate_response_chunk`) | TODO-09 |
 | WORK-06 | `handlers/gemini_handler.py` (`_scan_filedata_uris`, `handle`) | TODO-11 |
-| WORK-07 | `proxy.py` (`gsk_not_implemented` + 7 route decorators) | TODO-10 |
+| WORK-07 | `proxy.py` (`_not_implemented` + 7 route decorators) | TODO-10 |
 | WORK-08 | `proxy.py` (routes), `handlers/responses_handler.py` (new file) | TODO-01, TODO-02 |
 | WORK-09 | `proxy.py` (routes), `handlers/responses_handler.py`, `session.py` (response cache) | TODO-03, TODO-04, TODO-05 |
 | WORK-10 | `proxy.py` (route), `handlers/responses_handler.py` (`handle_compact`) | TODO-06 |
@@ -115,7 +115,7 @@ Fixed OA9 step 2 HTTP 400 — sequential multi-step tool calls.
 Root cause: `_derive_session_id()` falls back to `str(uuid.uuid4())` when no system
 message and no X-Session-ID header. Step 1 and step 2 of a multi-step tool call
 get different UUIDs → step 1 thoughtSignature never found in step 2 → proxy
-reconstructs assistant turn without thoughtSignature → GSK rejects with 400.
+reconstructs assistant turn without thoughtSignature →  rejects with 400.
 
 Fix: added third fallback — hash of the first user message (`usr_{sha256[:32]}`).
 The first user message is constant across all steps of a conversation, providing
