@@ -249,7 +249,7 @@ def handle(raw_body: bytes, token_manager, session_store: SessionStore) -> Respo
     is_streaming = openai_payload.get('stream', False)
 
     # Layer 3 + 4 — Session read + Translation
-    # TranslationError is raised by openai_to_gemini() for GSK-incompatible inputs
+    # TranslationError is raised by openai_to_gemini() for incompatible inputs
     # (e.g. https:// image URIs blocked by VPCSC — R18). Return 400 to client.
     try:
         gemini_payload, target_path = openai_to_gemini(openai_payload, session_id, session_store)
