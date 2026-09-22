@@ -6,12 +6,12 @@ Layer Architecture: Layer 2, 3, 5, 6, 7.
 Contracts Served: Contract 2, 3.
 Dependencies: json, time, uuid, requests, flask, config, transforms.path, session.
 
-GSK GATEWAY NOTE: The GSK Kong gateway runs a pre-Gemini-3 schema that does not
+ GATEWAY NOTE: The  Kong gateway runs a pre-Gemini-3 schema that does not
 recognise the 'id' field on functionCall or functionResponse objects. The
 _strip_function_ids() function removes these before forwarding while preserving
 them in session for thoughtSignature reconstruction.
 
-GSK VPCSC NOTE: fileData with http/https URIs are permanently blocked by VPC
+ VPCSC NOTE: fileData with http/https URIs are permanently blocked by VPC
 Service Controls. _scan_filedata_uris() pre-flight rejects these before forwarding.
 gs:// URIs are routable. (R18)
 
@@ -32,8 +32,8 @@ def _scan_filedata_uris(raw_body: bytes) -> str | None:
     """
     BEFORE MODIFYING THIS FUNCTION: Read RULES.md in the project root and follow all rules. No exceptions.
     Scans contents[].parts[] for fileData parts with http:// or https:// URIs.
-    GSK VPCSC permanently blocks these — they must be rejected at the proxy
-    before forwarding, not passed to GSK. gs:// URIs are safe to forward.
+     VPCSC permanently blocks these — they must be rejected at the proxy
+    before forwarding, not passed to gs:// URIs are safe to forward.
 
     Parameters: raw_body (bytes): The raw request body.
     Returns: str — error message if a blocked URI is found, None if safe to forward.
@@ -49,7 +49,7 @@ def _scan_filedata_uris(raw_body: bytes) -> str | None:
             uri = part.get('fileData', {}).get('fileUri', '')
             if uri.startswith('http://') or uri.startswith('https://'):
                 return (
-                    f"fileData HTTP/HTTPS URIs are blocked by GSK VPC Service Controls. "
+                    f"fileData HTTP/HTTPS URIs are blocked by  VPC Service Controls. "
                     f"Use inlineData (base64) or a GCS gs:// URI instead. "
                     f"Blocked URI: {uri[:80]}"
                 )
@@ -60,7 +60,7 @@ def _strip_function_ids(body: dict) -> dict:
     """
     BEFORE MODIFYING THIS FUNCTION: Read RULES.md in the project root and follow all rules. No exceptions.
     Strips 'id' field from all functionCall and functionResponse parts before
-    forwarding to the GSK gateway, which runs a schema that does not accept it.
+    forwarding to the  gateway, which runs a schema that does not accept it.
 
     Parameters: body (dict): Parsed request body.
     Returns: dict (modified body — same object, mutated in place)
@@ -86,7 +86,7 @@ def _repair_thought_signatures(raw_body: bytes, session_id: str,
     """
     BEFORE MODIFYING THIS FUNCTION: Read RULES.md in the project root and follow all rules. No exceptions.
     Validates and silently repairs missing thoughtSignatures from the session
-    before forwarding upstream. Also strips 'id' fields for GSK gateway
+    before forwarding upstream. Also strips 'id' fields for  gateway
     compatibility.
 
     Parameters: raw_body (bytes), session_id (str), session_store (SessionStore)
@@ -352,7 +352,7 @@ def handle(path: str, raw_body: bytes, token_manager,
         path, request.query_string.decode('utf-8') if request.query_string else '')
     headers = build_headers(token, request.headers)
 
-    # R18: Pre-flight fileData URI scan — reject http/https before forwarding to GSK
+    # R18: Pre-flight fileData URI scan — reject http/https before forwarding 
     # VPCSC permanently blocks these. gs:// URIs are allowed through.
     _uri_err = _scan_filedata_uris(raw_body)
     if _uri_err:
@@ -379,7 +379,7 @@ def handle(path: str, raw_body: bytes, token_manager,
             }
             body = json.dumps(_body_obj).encode('utf-8')
     except Exception:
-        pass  # Malformed JSON — let GSK return the error
+        pass  # Malformed JSON — let  return the error
 
     print(f"[{time.strftime('%H:%M:%S')}] 🚀 Forwarding to: {target_url}")
 
