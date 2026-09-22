@@ -1,7 +1,7 @@
-# GSK Gemini Proxy v2
+#  Gemini Proxy v2
 
 ## Project Overview
-GSK Gemini Proxy v2 (`proxy_v2`) is a robust, production-grade reverse proxy built with Flask. It serves as an intelligent intermediary between API clients (both OpenAI-compatible and native Gemini clients) and the GSK Kong API Gateway. It translates requests dynamically, handles OAuth2 authentication, orchestrates complex multi-turn state (such as tool-calling logic and thought signature injection), and enforces strict security protocols to comply with GSK VPC Service Controls. 
+ Gemini Proxy v2 (`proxy_v2`) is a robust, production-grade reverse proxy built with Flask. It serves as an intelligent intermediary between API clients (both OpenAI-compatible and native Gemini clients) and the  Kong API Gateway. It translates requests dynamically, handles OAuth2 authentication, orchestrates complex multi-turn state (such as tool-calling logic and thought signature injection), and enforces strict security protocols to comply with  VPC Service Controls. 
 
 ## Architecture/Layers
 The proxy follows a strict, traceable 7-layer architecture:
@@ -10,7 +10,7 @@ The proxy follows a strict, traceable 7-layer architecture:
 * **Layer 2: Token Management (`auth.py`)** - Thread-safe OAuth2 lifecycle management. It fetches, caches, and proactively refreshes Bearer tokens via a background locking mechanism.
 * **Layer 3: Session State (`session.py`)** - An in-memory, thread-safe store with TTL tracking. It maintains client states, maps `tool_call_id`s, caches `thoughtSignatures`, and stores server-side tool parts for seamless multi-turn reasoning.
 * **Layer 4 & 5: Request/Response Translation (`translate/request.py`, `translate/response.py`)** - Bidirectional schema translation. It reformats OpenAI Chat Completions requests into Gemini REST structures, handles schema sanitization (restricting to OpenAPI-3.0 subset), and converts response formats (including streaming chunk translation).
-* **Layer 6: Target Path Generation (`transforms/path.py`)** - Normalizes and rewrites URL paths for the GSK gateway.
+* **Layer 6: Target Path Generation (`transforms/path.py`)** - Normalizes and rewrites URL paths for the  gateway.
 * **Layer 7: Execution (`handlers/*.py`)** - Issues HTTP requests to the target URL, orchestrates streaming generators, and yields properly structured chunk deltas back to the client.
 
 ## Contracts Served
@@ -27,10 +27,10 @@ The application uses a strict single source of truth for configuration managed v
 It requires a `.env` file at the root of the project with the following required secrets. If any are missing, the application halts immediately with an `EnvironmentError`.
 
 **Required `.env` Variables:**
-* `GSK_OAUTH_URL` - The OAuth2 provider URL.
-* `GSK_CLIENT_ID` - OAuth client identifier.
-* `GSK_CLIENT_SECRET` - OAuth client secret.
-* `GSK_GEMINI_BASE_URL` - Base URL for the target GSK Kong Gateway.
+* `_OAUTH_URL` - The OAuth2 provider URL.
+* `_CLIENT_ID` - OAuth client identifier.
+* `_CLIENT_SECRET` - OAuth client secret.
+* `_GEMINI_BASE_URL` - Base URL for the target  Kong Gateway.
 
 **Tunable Constants (Set in `config.py`):**
 * `PROXY_PORT` (Default: 5000)
