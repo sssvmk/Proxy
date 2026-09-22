@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "gemini-proxy"
 version = "2.0.0"
-description = "GSK Gemini Proxy v2"
+description = "Gemini Proxy v2"
 requires-python = ">=3.8"
 dependencies = [
     "flask==3.0.0",
