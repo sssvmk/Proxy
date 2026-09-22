@@ -98,7 +98,7 @@ def _send(gemini_payload: dict, target_url: str, headers: dict,
             data=json.dumps(gemini_payload),
             timeout=(config.UPSTREAM_CONNECT_TIMEOUT, config.UPSTREAM_READ_TIMEOUT)
         )
-        print(f"[{time.strftime('%H:%M:%S')}] ← GSK status: {resp.status_code}")
+        print(f"[{time.strftime('%H:%M:%S')}] ←  status: {resp.status_code}")
 
         if resp.status_code >= 400:
             print(f"  ❌ Error body: {resp.text[:1000]}")
