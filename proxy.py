@@ -26,9 +26,9 @@ session_store = SessionStore()         # initialises empty store + TTL cleanup t
 token_manager.warm_up()                # eager token fetch — fails fast if credentials wrong
 
 print("══════════════════════════════════════════════")
-print("  GSK Gemini Proxy v2")
+print("  Gemini Proxy v2")
 print(f"  OAuth URL    : {config.OAUTH_URL}")
-print(f"  GSK Base URL : {config.GSK_BASE_URL}")
+print(f"   Base URL : {config._BASE_URL}")
 print(f"  Allowed Model: {config.ALLOWED_MODEL}")
 print(f"  Port         : {config.PROXY_PORT}")
 print(f"  Session TTL  : {config.SESSION_TTL_SECS}s")
@@ -58,7 +58,7 @@ def read_body_once():
 
 # ── Discovery endpoint intercepts ────────────────────────────────────────────
 # These are capability-discovery requests fired by OpenAI-compatible clients
-# (Hermes, LangChain, etc.) during initialisation. GSK gateway has no such
+# (Hermes, LangChain, etc.) during initialisation.  gateway has no such
 # endpoints — the proxy answers them locally with synthetic responses.
 # This prevents 400 error storms and wasteful session creation.
 
