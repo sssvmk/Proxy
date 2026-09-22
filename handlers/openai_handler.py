@@ -58,7 +58,7 @@ def _derive_session_id(openai_payload: dict) -> str:
     # (step 1 → step 2 → ...) share the same session and the proxy can
     # reattach thoughtSignatures stored in step 1 when processing step 2.
     # Without this each request gets a random UUID and the thoughtSignature
-    # stored in step 1 is never found in step 2 → GSK rejects step 2 (400).
+    # stored in step 1 is never found in step 2 → rejects step 2 (400).
     for msg in openai_payload.get('messages', []):
         if msg.get('role') == 'user':
             content = msg.get('content', '')
