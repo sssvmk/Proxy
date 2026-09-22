@@ -14,7 +14,7 @@ including "IMAGE") is demonstrated by Google on dedicated "-image" model
 variants (e.g. gemini-3.1-flash-image). Whether config.ALLOWED_MODEL
 (gemini-3.1-pro-preview) itself supports image output modality is NOT
 verified — this handler assumes support per explicit direction and lets
-GSK's own 400 surface naturally if the model rejects responseModalities,
+400 surface naturally if the model rejects responseModalities,
 same as any other unverified translation path in this codebase.
 
 SCOPE: /images/generations only. /images/edits and /images/variations
@@ -23,8 +23,8 @@ enough in request shape (multipart/form-data with an input image) to not
 bundle into this pass.
 
 KNOWN LIMITATIONS (flagged explicitly, not silently dropped):
-  - response_format="url" cannot be honored — GSK has no storage/hosting
-    layer (confirmed elsewhere in this codebase: GET/DELETE on GSK's other
+  - response_format="url" cannot be honored — has no storage/hosting
+    layer (confirmed elsewhere in this codebase: GET/DELETE on  other
     path aliases return 404, no storage layer exists). Always returns
     b64_json regardless of what the client requested; logged when it
     differs from the request.
