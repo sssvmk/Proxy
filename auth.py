@@ -14,7 +14,7 @@ import config
 class TokenManager:
     """
     BEFORE MODIFYING THIS CLASS: Read RULES.md in the project root and follow all rules. No exceptions.
-    Purpose: Fetches, caches, and proactively refreshes GSK OAuth2 tokens.
+    Purpose: Fetches, caches, and proactively refreshes XYZZ OAuth2 tokens.
     Thread-safety: Fully thread-safe using an internal threading.Lock.
     Lifecycle: Instantiated once globally at proxy startup.
     """
